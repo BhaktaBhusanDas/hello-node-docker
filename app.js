@@ -3,7 +3,7 @@ const app = express();
 const port = 3000;
 
 app.get('/', (req, res) => {
-    res.send('<h1>Hello world from dockerized Node.js App Version: 2.1</h1>');
+    res.send('<h1>Hello world from dockerized Node.js App Version: 2.2</h1>');
 
 });
 
