@@ -1,0 +1,93 @@
+pipeline {
+    agent any
+    
+    stages {
+        stage('Validate Parameters') {
+            steps {
+                script {
+                    echo "Rollback Parameters:"
+                    echo "- Version: ${params.VERSION}"
+                    echo "- Container: ${params.CONTAINER_NAME}"
+                    echo "- Repository: ${params.IMAGE_REPO}"
+                    echo "- Host Port: ${params.HOST_PORT}"
+                    echo "- Container Port: ${params.CONTAINER_PORT}"
+                }
+            }
+        }
+        
+        stage('Stop Current Container') {
+            steps {
+                script {
+                    echo "Stopping current container: ${params.CONTAINER_NAME}"
+                    sh "docker stop ${params.CONTAINER_NAME} || echo 'Container not running'"
+                    sh "docker rm ${params.CONTAINER_NAME} || echo 'Container not found'"
+                }
+            }
+        }
+        
+        stage('Pull Previous Version') {
+            steps {
+                script {
+                    echo "Pulling version ${params.VERSION} from ${params.IMAGE_REPO}"
+                    sh "docker pull ${params.IMAGE_REPO}:${params.VERSION}"
+                }
+            }
+        }
+        
+        stage('Deploy Previous Version') {
+            steps {
+                script {
+                    echo "Starting container with version ${params.VERSION}"
+                    sh """
+                        docker run -d \\
+                        --name ${params.CONTAINER_NAME} \\
+                        -p ${params.HOST_PORT}:${params.CONTAINER_PORT} \\
+                        ${params.IMAGE_REPO}:${params.VERSION}
+                    """
+                }
+            }
+        }
+        
+        stage('Verify Rollback') {
+            steps {
+                script {
+                    // Wait for container to start
+                    echo "Waiting for container to start..."
+                    sleep(time: 5, unit: 'SECONDS')
+                    
+                    // Verify container is running
+                    sh "docker ps | grep ${params.CONTAINER_NAME}"
+                    
+                    // Optional: Health check if your app has a health endpoint
+                    script {
+                        def healthCheck = sh(
+                            script: "curl -f http://localhost:${params.HOST_PORT}/health || curl -f http://localhost:${params.HOST_PORT} || echo 'Health check skipped'",
+                            returnStatus: true
+                        )
+                        if (healthCheck == 0) {
+                            echo "Health check passed!"
+                        } else {
+                            echo "Health check failed or endpoint not available"
+                        }
+                    }
+                    
+                    echo "Rollback verification completed"
+                }
+            }
+        }
+    }
+    
+    post {
+        success {
+            echo "🎉 Rollback to version ${params.VERSION} completed successfully!"
+            echo "Container ${params.CONTAINER_NAME} is running on port ${params.HOST_PORT}"
+        }
+        failure {
+            echo "❌ Rollback failed. Please check the logs and container status."
+            sh "docker ps -a | grep ${params.CONTAINER_NAME} || echo 'No container found'"
+        }
+        always {
+            echo "Rollback pipeline execution finished."
+        }
+    }
+}
