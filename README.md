@@ -242,7 +242,7 @@ docker inspect hello-node-app | grep Health -A 10
 
 ## 📝 Version History
 
-- **v2.3** (Current): Updated application messaging and enhanced features
+- **v2.3** (Current): Updated application version to 2.3.
 - **v2.0**: Enhanced Docker configuration and pipeline improvements
 - **v1.0**: Initial release with basic Express.js functionality
 
@@ -254,10 +254,6 @@ docker inspect hello-node-app | grep Health -A 10
 4. Commit changes: `git commit -am 'Add feature'`
 5. Push to branch: `git push origin feature-name`
 6. Submit a pull request
-
-## 📄 License
-
-This project is licensed under the ISC License - see the package.json file for details.
 
 ## 👨‍💻 Author
 
