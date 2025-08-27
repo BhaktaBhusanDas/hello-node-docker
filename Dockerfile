@@ -10,6 +10,8 @@ COPY . .
 
 EXPOSE 3000
 
+RUN apk --no-cache add curl
+
 HEALTHCHECK --interval=30s --timeout=5s --retries=3 \
 CMD curl -f http://localhost:3000/ || exit 1
 
