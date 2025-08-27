@@ -15,7 +15,7 @@ This application demonstrates a complete DevOps workflow with:
 ## 📋 Application Details
 
 - **Framework:** Node.js with Express.js
-- **Current Version:** 2.3
+- **Current Version:** 2.4
 - **Port:** 3000
 - **Health Check:** Built-in Docker health monitoring with curl
 - **Image Repository:** `bhaktabhusandas/hello-node-app`
@@ -242,7 +242,7 @@ docker inspect hello-node-app | grep Health -A 10
 
 ## 📝 Version History
 
-- **v2.3** (Current): Updated application version to 2.3.
+- **v2.4** (Current): Updated application version to 2.4(Updated the Docker file to install curl command.).
 - **v2.0**: Enhanced Docker configuration and pipeline improvements
 - **v1.0**: Initial release with basic Express.js functionality
 
